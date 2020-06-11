@@ -45,7 +45,7 @@ class WheatModule(pl.LightningModule):
         logger_logs = {'losses': logger_logs}
 
         output = {
-            'training_loss': loss,
+            'loss': loss,
             # 'progress_bar': {'training_loss': loss},
             # 'log': logger_logs
         }
