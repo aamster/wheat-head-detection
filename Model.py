@@ -80,7 +80,7 @@ class WheatModule(pl.LightningModule):
         return output
 
     def validation_epoch_end(self, outputs):
-        val_mean_precision = torch.stack([x['validation mean precision'] for x in outputs]).mean()
+        val_mean_precision = torch.stack([x['validation_mean_precision'] for x in outputs]).mean()
 
         log = {'avg validation mean precision': val_mean_precision}
 
