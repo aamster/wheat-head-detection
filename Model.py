@@ -78,7 +78,7 @@ class WheatModule(pl.LightningModule):
         }
 
         return output
-    
+
     def validation_epoch_end(self, outputs):
         val_mean_precision = torch.stack([x['validation mean precision'] for x in outputs]).mean()
 

@@ -25,7 +25,7 @@ class WheatDataLoader:
             train_dataset,
             batch_size=train_batch_size,
             shuffle=True,
-            num_workers=0,
+            num_workers=4,
             collate_fn=self._collate_fn
         )
 
@@ -33,7 +33,7 @@ class WheatDataLoader:
             valid_dataset,
             batch_size=validation_batch_size,
             shuffle=False,
-            num_workers=0,
+            num_workers=4,
             collate_fn=self._collate_fn
         )
 
