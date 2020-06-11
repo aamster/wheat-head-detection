@@ -57,7 +57,8 @@ class WheatModule(pl.LightningModule):
 
         preds = self.model(images)
 
-        mean_precisions = np.zeros(len(preds))
+        mean_precisions = torch.zeros(len(preds))
+        mean_precisions = mean_precisions.type_as(images[0])
         thresholds = np.arange(.5, .8, .05)
 
         for i, pred in enumerate(preds):
