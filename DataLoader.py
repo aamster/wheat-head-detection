@@ -6,7 +6,7 @@ from WheatDataset import WheatDataset
 
 
 class WheatDataLoader:
-    def get_data_loaders(self, dir_input, dir_train, debug=False):
+    def get_data_loaders(self, dir_input, dir_train, debug=False, num_workers=4):
         trainCsvReader = TrainCsvReader(dir_input=dir_input)
         df = trainCsvReader.preprocess()
         train_df, valid_df = trainCsvReader.train_test_split(df=df, test_frac=.3)
@@ -21,11 +21,12 @@ class WheatDataLoader:
         train_dataset = WheatDataset(dataframe=train_df, image_dir=dir_train, transforms=get_transforms(type='train'))
         valid_dataset = WheatDataset(dataframe=valid_df, image_dir=dir_train,
                                      transforms=get_transforms(type='validation'))
+
         train_data_loader = DataLoader(
             train_dataset,
             batch_size=train_batch_size,
             shuffle=True,
-            num_workers=4,
+            num_workers=num_workers,
             collate_fn=self._collate_fn
         )
 
@@ -33,7 +34,7 @@ class WheatDataLoader:
             valid_dataset,
             batch_size=validation_batch_size,
             shuffle=False,
-            num_workers=4,
+            num_workers=num_workers,
             collate_fn=self._collate_fn
         )
 

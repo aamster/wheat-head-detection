@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import pandas as pd
 import torch
+from pytorch_lightning.callbacks import EarlyStopping
 from torchvision.models.detection import faster_rcnn, fasterrcnn_resnet50_fpn
 import pytorch_lightning as pl
 from torchvision.ops.boxes import box_iou
@@ -73,7 +74,6 @@ class WheatModule(pl.LightningModule):
 
         output = {
             'validation_mean_precision': mean_mean_precision,
-            # 'progress_bar': {'validation_mean_precision': mean_mean_precision},
             # 'log': logger_logs
         }
 
@@ -85,7 +85,8 @@ class WheatModule(pl.LightningModule):
         log = {'avg validation mean precision': val_mean_precision}
 
         return {
-            'avg validation mean precision': val_mean_precision,
+            'validation_mean_precision': val_mean_precision,
+            'progress_bar': {'validation_mean_precision': val_mean_precision}
             # 'log': log
         }
 
@@ -139,6 +140,7 @@ if __name__ == '__main__':
     # parser.add_argument('--learning_rate', default=1e-3, type=float)
     parser.add_argument('-dir_input')
     parser.add_argument('-dir_train')
+    parser.add_argument('-num_workers', default=0)
 
     args = parser.parse_args()
 
@@ -147,8 +149,17 @@ if __name__ == '__main__':
     model.roi_heads.box_predictor = faster_rcnn.FastRCNNPredictor(in_features, num_classes=2)
 
     dl = WheatDataLoader()
-    train_dataloader, val_dataloader = dl.get_data_loaders(dir_input=args.dir_input, dir_train=args.dir_train)
+    train_dataloader, val_dataloader = dl.get_data_loaders(dir_input=args.dir_input, dir_train=args.dir_train,
+                                                           debug=True, num_workers=args.num_workers)
 
-    trainer = pl.Trainer.from_argparse_args(args=args)
+    early_stop_callback = EarlyStopping(
+        monitor='validation_mean_precision',
+        min_delta=0.00,
+        patience=3,
+        verbose=False,
+        mode='max'
+    )
+
+    trainer = pl.Trainer.from_argparse_args(args=args, early_stop_callback=early_stop_callback)
     wheatModule = WheatModule(model=model)
     trainer.fit(model=wheatModule, train_dataloader=train_dataloader, val_dataloaders=val_dataloader)
