@@ -45,8 +45,8 @@ class WheatModule(pl.LightningModule):
         logger_logs = {'losses': logger_logs}
 
         output = {
-            'loss': loss,
-            'progress_bar': {'training_loss': loss},
+            'training_loss': loss,
+            # 'progress_bar': {'training_loss': loss},
             # 'log': logger_logs
         }
 
@@ -72,13 +72,13 @@ class WheatModule(pl.LightningModule):
         logger_logs = {'validation_mean_precision': mean_mean_precision}
 
         output = {
-            'validation mean precision': mean_mean_precision,
-            'progress_bar': {'validation_mean_precision': mean_mean_precision},
+            'validation_mean_precision': mean_mean_precision,
+            # 'progress_bar': {'validation_mean_precision': mean_mean_precision},
             # 'log': logger_logs
         }
 
         return output
-
+    
     def validation_epoch_end(self, outputs):
         val_mean_precision = torch.stack([x['validation mean precision'] for x in outputs]).mean()
 
