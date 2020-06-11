@@ -47,7 +47,7 @@ class WheatModule(pl.LightningModule):
         output = {
             'loss': loss,
             'progress_bar': {'training_loss': loss},
-            'log': logger_logs
+            # 'log': logger_logs
         }
 
         return output
@@ -74,7 +74,7 @@ class WheatModule(pl.LightningModule):
         output = {
             'validation mean precision': mean_mean_precision,
             'progress_bar': {'validation_mean_precision': mean_mean_precision},
-            'log': logger_logs
+            # 'log': logger_logs
         }
 
         return output
@@ -86,7 +86,7 @@ class WheatModule(pl.LightningModule):
 
         return {
             'avg validation mean precision': val_mean_precision,
-            'log': log
+            # 'log': log
         }
 
     def predict(self, image_path):
