@@ -5,11 +5,9 @@ import torch
 from torchvision.ops import box_iou
 
 
-def _calculate_precision(boxes_true: torch.tensor, boxes_pred: torch.tensor, confidences: list, threshold=0.5) -> float:
+def _calculate_precision(boxes_true: torch.tensor, boxes_pred: torch.tensor, confidences: torch.tensor,
+                         threshold=0.5) -> float:
     """Calculates precision for GT - prediction pairs at one threshold."""
-
-    confidences = np.array(confidences)
-
     # edge case for no ground truth boxes
     if boxes_true.size(1) == 0:
         return 0.
