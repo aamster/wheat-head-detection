@@ -136,8 +136,8 @@ if __name__ == '__main__':
     parser = pl.Trainer.add_argparse_args(parent_parser=parser)
     # parser.add_argument('--batch_size', default=32)
     # parser.add_argument('--learning_rate', default=1e-3, type=float)
-    parser.add_argument('dir_input')
-    parser.add_argument('dir_train')
+    parser.add_argument('-dir_input')
+    parser.add_argument('-dir_train')
 
     args = parser.parse_args()
 
