@@ -129,18 +129,25 @@ class WheatModule(pl.LightningModule):
 
 
 if __name__ == '__main__':
+    from argparse import ArgumentParser
     from DataLoader import WheatDataLoader
 
-    dir_input = 'data'
-    dir_train = 'data/train'
+    parser = ArgumentParser()
+    parser = pl.Trainer.add_argparse_args(parent_parser=parser)
+    # parser.add_argument('--batch_size', default=32)
+    # parser.add_argument('--learning_rate', default=1e-3, type=float)
+    parser.add_argument('dir_input')
+    parser.add_argument('dir_train')
+
+    args = parser.parse_args()
 
     model = fasterrcnn_resnet50_fpn(pretrained=True)
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     model.roi_heads.box_predictor = faster_rcnn.FastRCNNPredictor(in_features, num_classes=2)
 
     dl = WheatDataLoader()
-    train_dataloader, val_dataloader = dl.get_data_loaders(dir_input=dir_input, dir_train=dir_train)
+    train_dataloader, val_dataloader = dl.get_data_loaders(dir_input=args.dir_input, dir_train=args.dir_train)
 
-    trainer = pl.Trainer(max_epochs=1)
+    trainer = pl.Trainer.from_argparse_args(args=args)
     wheatModule = WheatModule(model=model)
     trainer.fit(model=wheatModule, train_dataloader=train_dataloader, val_dataloaders=val_dataloader)
