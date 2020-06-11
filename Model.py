@@ -140,7 +140,7 @@ if __name__ == '__main__':
     # parser.add_argument('--learning_rate', default=1e-3, type=float)
     parser.add_argument('-dir_input')
     parser.add_argument('-dir_train')
-    parser.add_argument('-num_workers', default=0)
+    parser.add_argument('-num_workers', default=0, type=int)
 
     args = parser.parse_args()
 
