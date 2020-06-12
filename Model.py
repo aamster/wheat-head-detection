@@ -7,8 +7,8 @@ import torch
 from pytorch_lightning.callbacks import EarlyStopping
 from torchvision.models.detection import faster_rcnn, fasterrcnn_resnet50_fpn
 import pytorch_lightning as pl
-from torchvision.ops.boxes import box_iou
 
+from ProgressBar import CustomProgressBar
 from eval_metric import calculate_mean_precision
 
 
@@ -19,6 +19,7 @@ class WheatModule(pl.LightningModule):
         self.lr = lr
         self.momentum = momentum
         self.weight_decay = weight_decay
+        self.val_mean_precision = None
 
     def forward(self, x):
         return self.model(x)
@@ -81,6 +82,7 @@ class WheatModule(pl.LightningModule):
 
     def validation_epoch_end(self, outputs):
         val_mean_precision = torch.stack([x['validation_mean_precision'] for x in outputs]).mean()
+        self.val_mean_precision = val_mean_precision
 
         log = {'avg validation mean precision': val_mean_precision}
 
@@ -160,6 +162,7 @@ if __name__ == '__main__':
         mode='max'
     )
 
-    trainer = pl.Trainer.from_argparse_args(args=args, early_stop_callback=early_stop_callback)
+    progressBar = CustomProgressBar()
+    trainer = pl.Trainer.from_argparse_args(args=args, early_stop_callback=early_stop_callback, callbacks=[progressBar])
     wheatModule = WheatModule(model=model)
     trainer.fit(model=wheatModule, train_dataloader=train_dataloader, val_dataloaders=val_dataloader)
