@@ -157,8 +157,8 @@ if __name__ == '__main__':
     early_stop_callback = EarlyStopping(
         monitor='validation_mean_precision',
         min_delta=0.00,
-        patience=0,
-        verbose=False,
+        patience=1,
+        verbose=True,
         mode='max'
     )
 
