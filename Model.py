@@ -163,6 +163,6 @@ if __name__ == '__main__':
     )
 
     progressBar = CustomProgressBar()
-    trainer = pl.Trainer.from_argparse_args(args=args, callbacks=[progressBar])
+    trainer = pl.Trainer.from_argparse_args(args=args, early_stop_callback=early_stop_callback, callbacks=[progressBar])
     wheatModule = WheatModule(model=model)
     trainer.fit(model=wheatModule, train_dataloader=train_dataloader, val_dataloaders=val_dataloader)
