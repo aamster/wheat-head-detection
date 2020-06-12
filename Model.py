@@ -157,12 +157,12 @@ if __name__ == '__main__':
     early_stop_callback = EarlyStopping(
         monitor='validation_mean_precision',
         min_delta=0.00,
-        patience=1,
+        patience=3,
         verbose=True,
         mode='max'
     )
 
     progressBar = CustomProgressBar()
-    trainer = pl.Trainer.from_argparse_args(args=args, early_stop_callback=early_stop_callback, callbacks=[progressBar])
+    trainer = pl.Trainer.from_argparse_args(args=args, callbacks=[progressBar])
     wheatModule = WheatModule(model=model)
     trainer.fit(model=wheatModule, train_dataloader=train_dataloader, val_dataloaders=val_dataloader)

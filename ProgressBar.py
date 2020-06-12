@@ -24,7 +24,7 @@ class CustomProgressBar(ProgressBar):
         super().on_batch_end(trainer, pl_module)  # don't forget this :)
         percent = (self.train_batch_idx / self.total_train_batches) * 100
         sys.stdout.flush()
-        sys.stdout.write(f'Epoch {pl_module.current_epoch}: {percent:.01f} percent complete \r')
+        sys.stdout.write(f'Epoch {pl_module.current_epoch+1}: {percent:.01f} percent complete \r')
 
     def on_validation_end(self, trainer, pl_module):
         super().on_validation_end(trainer, pl_module)
