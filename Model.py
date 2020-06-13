@@ -8,7 +8,7 @@ import pytorch_lightning as pl
 
 from ProgressBar import CustomProgressBar
 from eval_metric import calculate_mean_precision
-from util import Plotter
+from Plotter import Plotter
 
 
 class WheatModule(pl.LightningModule):
