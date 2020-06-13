@@ -1,5 +1,3 @@
-from typing import Union, List, Optional
-
 import cv2
 import numpy as np
 import pandas as pd
@@ -10,6 +8,7 @@ import pytorch_lightning as pl
 
 from ProgressBar import CustomProgressBar
 from eval_metric import calculate_mean_precision
+from util import Plotter
 
 
 class WheatModule(pl.LightningModule):
@@ -19,7 +18,22 @@ class WheatModule(pl.LightningModule):
         self.lr = lr
         self.momentum = momentum
         self.weight_decay = weight_decay
-        self.val_mean_precision = None
+        self.current_train_loss = None
+        self._epoch_loss = {}
+        self._epoch_validation_precision = []
+
+    @property
+    def epoch_loss(self):
+        return self._epoch_loss
+
+    @property
+    def epoch_validation_precision(self):
+        return self._epoch_validation_precision
+
+    def update_epoch_loss(self, total_train_batches, train_batch_idx):
+        if self.current_epoch not in self._epoch_loss:
+            self._epoch_loss[self.current_epoch] = np.zeros(total_train_batches)
+        self._epoch_loss[self.current_epoch][train_batch_idx-1] = self.current_train_loss
 
     def forward(self, x):
         return self.model(x)
@@ -36,12 +50,12 @@ class WheatModule(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         images, targets, image_ids = batch
         targets = [{k: v for k, v in t.items()} for t in targets]
-
         # separate losses
         loss_dict = self.model(images, targets)
 
         # total loss
         loss = sum(loss for loss in loss_dict.values())
+        self.current_train_loss = loss
 
         logger_logs = {'training_loss': loss_dict}
         logger_logs = {'losses': logger_logs}
@@ -82,7 +96,7 @@ class WheatModule(pl.LightningModule):
 
     def validation_epoch_end(self, outputs):
         val_mean_precision = torch.stack([x['validation_mean_precision'] for x in outputs]).mean()
-        self.val_mean_precision = val_mean_precision
+        self._epoch_validation_precision.append(val_mean_precision)
 
         log = {'avg validation mean precision': val_mean_precision}
 
@@ -162,7 +176,10 @@ if __name__ == '__main__':
         mode='max'
     )
 
-    progressBar = CustomProgressBar()
-    trainer = pl.Trainer.from_argparse_args(args=args, early_stop_callback=early_stop_callback, callbacks=[progressBar])
+    progress = CustomProgressBar()
+    trainer = pl.Trainer.from_argparse_args(args=args, early_stop_callback=early_stop_callback, callbacks=[progress],
+                                            show_progress_bar=False)
     wheatModule = WheatModule(model=model)
     trainer.fit(model=wheatModule, train_dataloader=train_dataloader, val_dataloaders=val_dataloader)
+    plotter = Plotter()
+    plotter.plot_metrics(losses=wheatModule.epoch_loss, val_precisions=wheatModule.epoch_validation_precision)

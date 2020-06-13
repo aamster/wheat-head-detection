@@ -1,9 +1,11 @@
-import sys
-
+import numpy as np
 from pytorch_lightning.callbacks import ProgressBar
 
 
 class CustomProgressBar(ProgressBar):
+    def __init__(self):
+        super().__init__()
+
 
     def init_sanity_tqdm(self):
         bar = super().init_sanity_tqdm()
@@ -21,11 +23,5 @@ class CustomProgressBar(ProgressBar):
         return bar
 
     def on_batch_end(self, trainer, pl_module):
-        super().on_batch_end(trainer, pl_module)  # don't forget this :)
-        percent = (self.train_batch_idx / self.total_train_batches) * 100
-        sys.stdout.flush()
-        sys.stdout.write(f'Epoch {pl_module.current_epoch+1}: {percent:.01f} percent complete \r')
-
-    def on_validation_end(self, trainer, pl_module):
-        super().on_validation_end(trainer, pl_module)
-        print(f'\tval mean precision: {pl_module.val_mean_precision}')
+        super().on_batch_end(trainer, pl_module)
+        pl_module.update_epoch_loss(total_train_batches=self.total_train_batches, train_batch_idx=self.train_batch_idx)
