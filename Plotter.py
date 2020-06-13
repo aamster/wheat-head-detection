@@ -20,7 +20,7 @@ class Plotter:
                 .reset_index()
                 .rename(columns={'index': 'iter'})
         )
-        fig = px.line(losses, x='iter', y='loss')
+        fig = px.line(losses, x='iter', y='loss', color='epoch')
         fig.write_html('plots/losses.html')
 
     @staticmethod
